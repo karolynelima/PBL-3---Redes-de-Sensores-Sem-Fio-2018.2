@@ -64,11 +64,11 @@ public class AtividadeServidor extends Thread{
 
     @Override
     public void run() {
-        String array[] = mensagem.split("$");
+        String array[] = mensagem.split("%");
         try{
             switch(array[0]){
                 case "NOVO":
-                    novoNo(array[1], array[2], array[3]);
+                    novoNo(array[1], array[2], array[3], array[4]);
                 break;
             }
         }catch(IOException x){
@@ -76,8 +76,8 @@ public class AtividadeServidor extends Thread{
         }
     }
     
-    public void novoNo(String enderecoNo, String portaNo, String caminho) throws IOException{
-        control.addNo(IP, portaNo, caminho);
+    public void novoNo(String enderecoNo, String portaNo,String id, String pai) throws IOException{
+        control.addNo(IP, portaNo, id, pai);
         saidaTCP = new ObjectOutputStream(clienteTCP.getOutputStream());
         saidaTCP.writeObject("CONECTADO e ADICIONADO!!");
         saidaTCP.close();

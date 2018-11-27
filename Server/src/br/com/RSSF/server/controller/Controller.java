@@ -14,36 +14,52 @@ import java.util.LinkedList;
  */
 public class Controller {
     private LinkedList<Sensor> sensores;
-    private Sensor ponte;
 
-    public void addNo(String IP, String portaNo, String caminho) {
-        Sensor filho = new Sensor(IP, portaNo);
-        if(caminho.equals("")){
-            ponte = filho;
+    public Controller() {
+        sensores = new LinkedList<>();
+    }
+
+    public void addNo(String IP, String portaNo, String id, String pai) {
+        Sensor filho = new Sensor(IP, portaNo, id);
+        Sensor dad = findSensor(pai);
+        
+        if(pai.equals("") || pai == null)
             filho.setAcesso(true);
-        }else{
-            LinkedList<String> list = new LinkedList<>();
-            String aux[] = caminho.split("#");
-            for(String a: aux){
-                Sensor s = findSensor(a);
-                if(s!=null)
-                    if(s.getIp().equals(a))
-                        list.add(a);
-                    else
-                        break;
-                else
-                    break;
-            }
-            filho.setCaminho(list);
-        }        
+        else if(dad!=null){
+            dad.addFilhos(filho);
+            dad.setAcesso(true);
+        }
         sensores.add(filho);
     }
     
     public Sensor findSensor(String sensor){
         for(Sensor s: sensores){
-            if(s.getIp().equals(sensor))
+            if(s.getIdSensor().equals(sensor))
                 return s;
         }
         return null;
     }
+    
+    public String getIP(String id){
+        return findSensor(id).getIp();
+    }
+    
+    public String getPorta(String id){
+        return findSensor(id).getPorta();
+    }
+
+    public String[] listarSensores() {
+        String s[] = new String[sensores.size()];
+        int i=0;
+        for(Sensor sen: sensores){
+            s[i] = sen.getIdSensor()+"->";
+            for(Sensor sensor:sen.getFilhos()){
+                s[i] +=","+sensor.getIdSensor();
+            }
+            i++;
+        }
+        return s;
+    }
+    
+    
 }

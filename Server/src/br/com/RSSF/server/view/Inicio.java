@@ -8,6 +8,10 @@ package br.com.RSSF.server.view;
 import br.com.RSSF.server.connection.ServerTCP;
 import br.com.RSSF.server.controller.Controller;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.util.Timer;
+import java.util.TimerTask;
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
 /**
@@ -22,7 +26,9 @@ public class Inicio extends javax.swing.JFrame {
     private ServerTCP servicoTCP;
     private Controller control;
     public Inicio() {
+        control = new Controller();
         initComponents();
+        init();
     }
 
     /**
@@ -39,9 +45,10 @@ public class Inicio extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         btnInit = new javax.swing.JButton();
+        lbIp = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jList2 = new javax.swing.JList<>();
+        listSensores = new javax.swing.JList<>();
         jLabel2 = new javax.swing.JLabel();
 
         jList1.setModel(new javax.swing.AbstractListModel<String>() {
@@ -65,15 +72,16 @@ public class Inicio extends javax.swing.JFrame {
             }
         });
         jPanel1.add(btnInit);
+        jPanel1.add(lbIp);
 
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
-        jList2.setModel(new javax.swing.AbstractListModel<String>() {
+        listSensores.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
-        jScrollPane2.setViewportView(jList2);
+        jScrollPane2.setViewportView(listSensores);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -136,11 +144,27 @@ public class Inicio extends javax.swing.JFrame {
     private void btnInitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInitActionPerformed
         try {
             servicoTCP = new ServerTCP(1234, control);
+            lbIp.setText(InetAddress.getByName("localhost").getHostAddress());
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(rootPane, "Não foi possível iniciar o serviço!");
         }
     }//GEN-LAST:event_btnInitActionPerformed
-
+    
+    private void init(){
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                String str[] = control.listarSensores();
+                if(str.length!=0){
+                    DefaultListModel listmodel = new DefaultListModel();
+                    for(String s:str)
+                        listmodel.addElement(s);
+                    listSensores.setModel(listmodel);
+                    listSensores.setVisible(true);
+                }                
+            }
+        }, 10000, 5000);
+    }
     /**
      * @param args the command line arguments
      */
@@ -181,10 +205,11 @@ public class Inicio extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JList<String> jList1;
-    private javax.swing.JList<String> jList2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lbIp;
+    private javax.swing.JList<String> listSensores;
     // End of variables declaration//GEN-END:variables
 }

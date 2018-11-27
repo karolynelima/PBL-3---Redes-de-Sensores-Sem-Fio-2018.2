@@ -33,7 +33,7 @@ public class ServerTCP implements Runnable{
                 // aceitando a conexão com o cliente e inicializando uma thread
                 //Ao receber uma conexão, cria-se uma thread do tipo AtividadeServidor que irá tratar as informações recebidas
                 System.out.println("esperando");
-                new AtividadeServidor(server.accept(),control).run();
+                new AtividadeServidor(server.accept(),control).start();
                 System.out.println("Mais um cliente TCP atendido!");
             }
 

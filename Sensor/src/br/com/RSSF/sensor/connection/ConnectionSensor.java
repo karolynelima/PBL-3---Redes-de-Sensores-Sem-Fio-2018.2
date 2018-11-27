@@ -35,17 +35,20 @@ public class ConnectionSensor {
     public ConnectionSensor(String adress, String port, Controller control) throws IOException {
         this.adressPai = adress;
         this.portaPai = Integer.parseInt(port);
-        socket = new Socket(adress, portaPai);
+        socket = new Socket(adressPai, portaPai);
         this.control = control;
     }
     
-    public void addNo(String ipno, String porta, String caminho) throws IOException, ClassNotFoundException{
+    public String addNo(String ipno, String porta, String idlocal, String idPai) throws IOException, ClassNotFoundException{
         out = new ObjectOutputStream(socket.getOutputStream()); // CRIAMOS OUTPUTSTREAM USANDO O MÉTODO DO SOCKET PARA ENVIAR DADOS
-        out.writeObject("NOVO%"+ipno+"$"+porta+"$"+caminho); //ESCREVEMOS OS DADOS NO OUTPUTSTREAM (ISSO BASTA PARA TRANSMITIR)        
+        out.writeObject("NOVO%"+ipno+"%"+porta+"%"+idlocal+"%"+idPai); //ESCREVEMOS OS DADOS NO OUTPUTSTREAM (ISSO BASTA PARA TRANSMITIR)        
         in = new ObjectInputStream(socket.getInputStream());
-        if(((String)in.readObject()).equals("CONECTADO")){
-            control.addPai(adressPai, ""+portaPai);
-        }
+        return (String) in.readObject();
+//        return "FOI";
+    }
+
+    public void sendData(String dados) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
     

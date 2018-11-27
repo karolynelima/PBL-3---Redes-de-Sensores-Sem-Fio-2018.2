@@ -9,7 +9,6 @@ import java.util.LinkedList;
 
 public class Sensor {
     private LinkedList<Sensor> filhos;
-    private LinkedList<String> caminho;
     private String ip, porta;
         
     private String idSensor;
@@ -18,9 +17,11 @@ public class Sensor {
     private String temp;
     private Boolean acesso;//Variável 
 
-    public Sensor(String ip, String porta) {
+    public Sensor(String ip, String porta, String id) {
         this.ip = ip;
         this.porta = porta;
+        this.idSensor = id;        
+        filhos = new LinkedList<>();
     }
 
     public Sensor(String idSensor, String humidade, String vlcVento, String temp, Boolean acesso) {
@@ -86,13 +87,5 @@ public class Sensor {
 
     public void setTemp(String temp) {
         this.temp = temp;
-    }
-    
-    public LinkedList<String> getCaminho() {
-        return caminho;
-    }
-
-    public void setCaminho(LinkedList<String> caminho) {
-        this.caminho = caminho;
     }
 }

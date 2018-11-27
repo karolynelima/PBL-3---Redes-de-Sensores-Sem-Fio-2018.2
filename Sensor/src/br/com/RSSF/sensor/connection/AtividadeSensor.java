@@ -67,7 +67,7 @@ public class AtividadeSensor extends Thread{
         try{
             switch(array[0]){
                 case "NOVO":
-                    novoSensor(array[1], array[2], array[3]);
+                    novoSensor(array[1], array[2], array[3], array[4]);
                 break;
             }        
         } catch (IOException | ClassNotFoundException ex) {
@@ -75,11 +75,11 @@ public class AtividadeSensor extends Thread{
      }
     }
 
-    private void novoSensor(String ip, String porta, String pai) throws UnknownHostException, IOException, ClassNotFoundException {
-        if(pai.equals(""))
-            control.addFilho(ip, porta);
-        connec.addNo(ip, porta, pai+"#"+Inet4Address.getByName("localhost").getHostAddress());
+    private void novoSensor(String ip, String porta,String id, String pai) throws UnknownHostException, IOException, ClassNotFoundException {
+        connec.addNo(ip, porta, id, pai);
+        control.setAcesso(true);
         saidaTCP = new ObjectOutputStream(clienteTCP.getOutputStream());
-        saidaTCP.writeObject("CONECTADO");
+        saidaTCP.writeObject("CONECTADO e ADICIONADO!!");
+        saidaTCP.close();
     }
 }
