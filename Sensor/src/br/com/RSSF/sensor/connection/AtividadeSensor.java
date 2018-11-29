@@ -11,10 +11,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,8 +35,10 @@ public class AtividadeSensor extends Thread{
     private byte[] saidaUDP;
     private String IP;
     private ConnectionSensor connec;
+    private String ipGrupo = "230.0.0.0";
+    private int ptgrupo; //variáveis para o grupo multicast
     
-    public AtividadeSensor(Socket cliente, Controller control, ConnectionSensor connect) throws IOException, ClassNotFoundException   {
+    public AtividadeSensor(Socket cliente, Controller control, ConnectionSensor connect, int ptgrupo) throws IOException, ClassNotFoundException   {
         clienteTCP = cliente;//Recebe a conexão          
         this.control = control;//Seta o objeto que contém as informações do sistema        
         entradaTCP = new ObjectInputStream(clienteTCP.getInputStream());//Decifra as informações vindas do cliente
@@ -44,6 +46,7 @@ public class AtividadeSensor extends Thread{
         mensagem = (String) entradaTCP.readObject();  
         System.out.println(mensagem);
         this.connec = connect;
+        this.ptgrupo = ptgrupo;
         
         IP = InetAddress.getLocalHost().getHostAddress();        
     }
@@ -63,11 +66,14 @@ public class AtividadeSensor extends Thread{
     
  @Override
     public void run(){
-        String array[] = mensagem.split("$");
+        String array[] = mensagem.split("%");
         try{
             switch(array[0]){
                 case "NOVO":
-                    novoSensor(array[1], array[2], array[3], array[4]);
+                    novoSensor(array[1], array[2], array[3], array[4], array[5]);
+                break;
+                case "DADOS":
+                    updateNo(array[1], array[2]);
                 break;
             }        
         } catch (IOException | ClassNotFoundException ex) {
@@ -75,11 +81,28 @@ public class AtividadeSensor extends Thread{
      }
     }
 
-    private void novoSensor(String ip, String porta,String id, String pai) throws UnknownHostException, IOException, ClassNotFoundException {
-        connec.addNo(ip, porta, id, pai);
-        control.setAcesso(true);
+    private void novoSensor(String ip, String porta,String id, String pai, String salto) throws UnknownHostException, IOException, ClassNotFoundException {        
+        control.setAcesso(true); //Como ele está respondendo requisição ele já é um ponto de acesso
+               
+        int i = Integer.parseInt(salto);//Verifica se já foi adicionado por alguém
+        if(i==1){                        
+            control.addAdjacente(ip, porta, id);
+            i--;
+        }
+        String resp = connec.addNo(ip, porta, id, pai,i);
+        
         saidaTCP = new ObjectOutputStream(clienteTCP.getOutputStream());
-        saidaTCP.writeObject("CONECTADO e ADICIONADO!!");
+        if(resp.contains("#") || resp.equals("CONECTADO e ADICIONADO!!"))
+            saidaTCP.writeObject(control.getIdPai()+"#"+control.getIpPai()+"#"+control.getPortaPai()+"#"+ipGrupo+"#"+ptgrupo);
+        else
+            saidaTCP.writeObject("Não foi possível adicionar");
+        saidaTCP.close();
+    }
+
+    private void updateNo(String id, String dados) throws IOException, ClassNotFoundException {
+        String resp = connec.sendData(id, dados);
+        saidaTCP = new ObjectOutputStream(clienteTCP.getOutputStream());
+        saidaTCP.writeObject(resp);
         saidaTCP.close();
     }
 }

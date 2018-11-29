@@ -28,13 +28,14 @@ public class Controller {
         else if(dad!=null){
             dad.addFilhos(filho);
             dad.setAcesso(true);
+            filho.addFilhos(dad);
         }
         sensores.add(filho);
     }
     
-    public Sensor findSensor(String sensor){
+    public Sensor findSensor(String identificador){
         for(Sensor s: sensores){
-            if(s.getIdSensor().equals(sensor))
+            if(s.getIdSensor().equals(identificador))
                 return s;
         }
         return null;
@@ -59,6 +60,17 @@ public class Controller {
             i++;
         }
         return s;
+    }
+
+    public String updateNo(String identi, String umidade, String temperatura, String vento) {
+        Sensor a = findSensor(identi);
+        if(a!=null){
+            a.setHumidade(umidade);
+            a.setTemp(temperatura);
+            a.setVlcVento(vento);
+            return "Atualizado";
+        }else
+            return "Não atualizou";
     }
     
     

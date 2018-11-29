@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.com.RSSF.server.connection;
+package br.com.RSSF.sensor.connection;
 
-import br.com.RSSF.server.controller.Controller;
+import br.com.RSSF.sensor.controller.Controller;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
@@ -25,16 +25,22 @@ public class MulticastReceiver extends Thread {
     protected byte[] buf = new byte[256];
     private String IP;
     private ObjectOutputStream out;
+    private Controller controller;
+    private String ipGrupo;
+    private int portaGrupo;
 
-    public MulticastReceiver(Controller control) throws UnknownHostException{
+    public MulticastReceiver(Controller control, String ip, String porta) throws UnknownHostException{
+        controller = control;
         IP = InetAddress.getLocalHost().getHostAddress();
+        ipGrupo = ip;
+        portaGrupo = Integer.parseInt(porta);
     }
     
     @Override
     public void run() {
         try {
-            socket = new MulticastSocket(4446);
-            InetAddress group = InetAddress.getByName("230.0.0.0");
+            socket = new MulticastSocket(portaGrupo);
+            InetAddress group = InetAddress.getByName(ipGrupo);
             socket.joinGroup(group);
             //socket.setSoTimeout(10000);
             while (true) {
@@ -43,7 +49,7 @@ public class MulticastReceiver extends Thread {
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 socket.receive(packet);                
                 String received = new String(packet.getData(), 0, packet.getLength());
-                //tratarConec(received);
+                trataMens(received);
                 
                 System.out.println(received);
                 if ("end".equals(received)) {
@@ -60,6 +66,16 @@ public class MulticastReceiver extends Thread {
     public byte[] buffer(){
         return buf;
     }
-    
+    private void trataMens(String mensagem){
+        String aux[] = mensagem.split("#");
+        switch (aux[0]){
+            case "NOVO PAI":
+                if(!aux[1].equals(controller.getId()))
+                    controller.setPai(aux[1], aux[2], aux[3]);
+                else
+                    controller.setPai(controller.getIdVo(), controller.getIpVo(), controller.getPortaVo());
+            break;
+        }
+    }
 }
 

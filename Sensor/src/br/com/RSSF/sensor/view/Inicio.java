@@ -6,6 +6,8 @@
 package br.com.RSSF.sensor.view;
 
 import br.com.RSSF.sensor.connection.ConnectionSensor;
+import br.com.RSSF.sensor.connection.MulticastPublisher;
+import br.com.RSSF.sensor.connection.MulticastReceiver;
 import br.com.RSSF.sensor.connection.ServerTCP;
 import br.com.RSSF.sensor.controller.Controller;
 import java.io.IOException;
@@ -30,12 +32,16 @@ public class Inicio extends javax.swing.JFrame {
     private ConnectionSensor connection;
     private Controller control;
     private String porta;
-    private String idLocal;
+    private String idLocal, ipLocal = Inet4Address.getByName("localhost").getHostAddress();
+    private MulticastPublisher publisher;
+    private MulticastReceiver receiver;
     public Inicio() throws UnknownHostException {
         initComponents();
-        control = new Controller();
-        porta = JOptionPane.showInputDialog(Inet4Address.getByName("localhost").getHostAddress()+" Porta:");
+        porta = JOptionPane.showInputDialog(ipLocal+" Porta:");
         idLocal = JOptionPane.showInputDialog("Identificador:");
+        jLabel1.setText(jLabel1.getText()+" "+idLocal);
+        lbIP.setText(lbIP.getText()+" "+ipLocal+":"+porta);        
+        control = new Controller(idLocal, ipLocal, porta);
         init();
     }
 
@@ -73,7 +79,9 @@ public class Inicio extends javax.swing.JFrame {
         jlUmidade = new javax.swing.JLabel();
         jlVento = new javax.swing.JLabel();
         jlTemp = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        btnEnviar = new javax.swing.JButton();
+        lbIP = new javax.swing.JLabel();
+        lbGrupo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -86,6 +94,7 @@ public class Inicio extends javax.swing.JFrame {
 
         jLabel3.setText("Porta:");
 
+        txtIP.setText("127.0.0.1");
         txtIP.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtIPActionPerformed(evt);
@@ -198,18 +207,21 @@ public class Inicio extends javax.swing.JFrame {
 
         jLabel9.setText("Temperatura:");
 
+        jsUmidade.setValue(0);
         jsUmidade.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 jsUmidadeMouseDragged(evt);
             }
         });
 
+        jsVento.setValue(0);
         jsVento.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 jsVentoMouseDragged(evt);
             }
         });
 
+        jsTemp.setValue(0);
         jsTemp.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 jsTempMouseDragged(evt);
@@ -222,10 +234,11 @@ public class Inicio extends javax.swing.JFrame {
 
         jlTemp.setText("00");
 
-        jButton1.setText("Enviar");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnEnviar.setText("Enviar");
+        btnEnviar.setEnabled(false);
+        btnEnviar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnEnviarActionPerformed(evt);
             }
         });
 
@@ -262,7 +275,7 @@ public class Inicio extends javax.swing.JFrame {
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                .addComponent(btnEnviar)
                 .addGap(18, 18, 18))
         );
         jPanel4Layout.setVerticalGroup(
@@ -292,9 +305,13 @@ public class Inicio extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jsTemp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1)))
+                        .addComponent(btnEnviar)))
                 .addContainerGap())
         );
+
+        lbIP.setText("IP:");
+
+        lbGrupo.setText("IP Grupo:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -319,13 +336,22 @@ public class Inicio extends javax.swing.JFrame {
                                 .addGap(0, 330, Short.MAX_VALUE)
                                 .addComponent(btnConect, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addContainerGap())))
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lbIP)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lbGrupo)
+                        .addGap(187, 187, 187))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(6, 6, 6)
                 .addComponent(jLabel1)
+                .addGap(9, 9, 9)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lbIP)
+                    .addComponent(lbGrupo))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -345,7 +371,7 @@ public class Inicio extends javax.swing.JFrame {
     }//GEN-LAST:event_txtIPActionPerformed
 
     private void btnAdicionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdicionarActionPerformed
-        control.addFilho(txtIP.getText(), txtPorta.getText(), txtId.getText());  
+        control.addAdjacente(txtIP.getText(), txtPorta.getText(), txtId.getText());  
         btnConect.setEnabled(true);
     }//GEN-LAST:event_btnAdicionarActionPerformed
 
@@ -353,35 +379,51 @@ public class Inicio extends javax.swing.JFrame {
         try {
             connection = new ConnectionSensor(control.getIpPai(), control.getPortaPai(), control);
             new ServerTCP(Integer.parseInt(porta), control, connection);
-            //connection.conecta();
-            String resp = connection.addNo(Inet4Address.getByName("localhost").getHostAddress(), porta, idLocal, control.getIdPai());
+            String resp = connection.addNo(ipLocal, porta, idLocal, control.getIdPai(), 1);
             JOptionPane.showMessageDialog(null, resp);
-        } catch (IOException ex) {
+            if(resp.contains("#")){
+                String grupo[] = resp.split("#");
+                control.setVo(grupo[0], grupo[1], grupo[2]);
+                publisher = new MulticastPublisher(grupo[3], grupo[4]);
+                receiver = new MulticastReceiver(control, grupo[3], grupo[4]);
+                receiver.start();
+                lbGrupo.setText(lbGrupo.getText()+" "+grupo[3]+":"+grupo[4]);
+            }
+        } catch (IOException | ClassNotFoundException ex) {
             JOptionPane.showMessageDialog(rootPane, "Nao foi possível conectar ao IP");
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Inicio.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                publisher.mandaMensagem("NOVO PAI#"+idLocal+"#"+ipLocal+"#"+porta);
+                connection = new ConnectionSensor(control.getIpPai(), control.getPortaPai(), control);
+            } catch (IOException ex1) {
+                JOptionPane.showMessageDialog(null, "Grupo Morto");
+            }
         }
+        btnEnviar.setEnabled(true);
     }//GEN-LAST:event_btnConectActionPerformed
 
     private void jsUmidadeMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jsUmidadeMouseDragged
         jlUmidade.setText(jsUmidade.getValue()+"%");
-        control.setUmidade(jlUmidade.getText());
+//        control.setUmidade(jlUmidade.getText());
     }//GEN-LAST:event_jsUmidadeMouseDragged
 
     private void jsVentoMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jsVentoMouseDragged
         jlVento.setText(jsVento.getValue()+" Km/h");
-        control.setVento(jlVento.getText());        
+//        control.setVento(jlVento.getText());        
     }//GEN-LAST:event_jsVentoMouseDragged
 
     private void jsTempMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jsTempMouseDragged
         jlTemp.setText(jsTemp.getValue()+"ºC");
-        control.setTemperatura(jlTemp.getText());
+//        control.setTemperatura(jlTemp.getText());
     }//GEN-LAST:event_jsTempMouseDragged
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String dados = control.getDados();
-        connection.sendData(dados);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void btnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviarActionPerformed
+        String dados = jsUmidade.getValue()+"#"+jsTemp.getValue()+"#"+jsVento.getValue();
+        try {
+            JOptionPane.showMessageDialog(null, connection.sendData(idLocal, dados));
+        } catch (IOException | ClassNotFoundException ex) {
+            JOptionPane.showMessageDialog(null, "Erro de conexão ao mandar dados! "+ex);
+        } 
+    }//GEN-LAST:event_btnEnviarActionPerformed
 
     private void init(){
         Timer timer = new Timer();
@@ -442,7 +484,7 @@ public class Inicio extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdicionar;
     private javax.swing.JButton btnConect;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnEnviar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -462,6 +504,8 @@ public class Inicio extends javax.swing.JFrame {
     private javax.swing.JSlider jsTemp;
     private javax.swing.JSlider jsUmidade;
     private javax.swing.JSlider jsVento;
+    private javax.swing.JLabel lbGrupo;
+    private javax.swing.JLabel lbIP;
     private javax.swing.JList<String> listAdj;
     private javax.swing.JTextField txtIP;
     private javax.swing.JTextField txtId;

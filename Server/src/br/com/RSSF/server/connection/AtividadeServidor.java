@@ -14,6 +14,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -70,16 +71,26 @@ public class AtividadeServidor extends Thread{
                 case "NOVO":
                     novoNo(array[1], array[2], array[3], array[4]);
                 break;
+                case "DADOS":
+                    updateNo(array[1], array[2]);
             }
         }catch(IOException x){
-            
+            JOptionPane.showMessageDialog(null, "Erro ao responder");
         }
     }
     
-    public void novoNo(String enderecoNo, String portaNo,String id, String pai) throws IOException{
-        control.addNo(IP, portaNo, id, pai);
+    private void novoNo(String enderecoNo, String portaNo, String id, String pai) throws IOException{
+        control.addNo(enderecoNo, portaNo, id, pai);
         saidaTCP = new ObjectOutputStream(clienteTCP.getOutputStream());
         saidaTCP.writeObject("CONECTADO e ADICIONADO!!");
+        saidaTCP.close();
+    }
+
+    private void updateNo(String identi, String dados) throws IOException {
+        String aux[] = dados.split("#");
+        String resp = control.updateNo(identi, aux[0], aux[1], aux[2]);
+        saidaTCP = new ObjectOutputStream(clienteTCP.getOutputStream());
+        saidaTCP.writeObject(resp);
         saidaTCP.close();
     }
 }

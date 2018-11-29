@@ -35,20 +35,34 @@ public class ConnectionSensor {
     public ConnectionSensor(String adress, String port, Controller control) throws IOException {
         this.adressPai = adress;
         this.portaPai = Integer.parseInt(port);
-        socket = new Socket(adressPai, portaPai);
         this.control = control;
     }
     
-    public String addNo(String ipno, String porta, String idlocal, String idPai) throws IOException, ClassNotFoundException{
+    public String addNo(String ipno, String porta, String idlocal, String idPai, int cont) throws IOException, ClassNotFoundException{
+        conecta();
         out = new ObjectOutputStream(socket.getOutputStream()); // CRIAMOS OUTPUTSTREAM USANDO O MÉTODO DO SOCKET PARA ENVIAR DADOS
-        out.writeObject("NOVO%"+ipno+"%"+porta+"%"+idlocal+"%"+idPai); //ESCREVEMOS OS DADOS NO OUTPUTSTREAM (ISSO BASTA PARA TRANSMITIR)        
+        out.writeObject("NOVO%"+ipno+"%"+porta+"%"+idlocal+"%"+idPai+"%"+cont); //ESCREVEMOS OS DADOS NO OUTPUTSTREAM (ISSO BASTA PARA TRANSMITIR)        
         in = new ObjectInputStream(socket.getInputStream());
-        return (String) in.readObject();
-//        return "FOI";
+        String resp = (String) in.readObject();
+        desconecta();
+        return resp;
     }
 
-    public void sendData(String dados) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public String sendData(String id, String dados) throws IOException, ClassNotFoundException {
+        conecta();
+        out = new ObjectOutputStream(socket.getOutputStream());
+        out.writeObject("DADOS%"+id+"%"+dados);
+        in = new ObjectInputStream(socket.getInputStream());
+        String resp = (String) in.readObject();
+        desconecta();
+        return resp;
+    }
+    
+    public void conecta() throws IOException{        
+        socket = new Socket(adressPai, portaPai);
+    }
+    public void desconecta() throws IOException{
+        socket.close();
     }
 }
     

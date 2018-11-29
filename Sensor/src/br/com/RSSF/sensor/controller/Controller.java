@@ -13,68 +13,79 @@ import java.util.LinkedList;
  * @author kkaro
  */
 public class Controller {
-    private LinkedList<Sensor> sensoresFilhos;
-    private Sensor sensor;
+    private LinkedList<Sensor> sensoresAdj;
+    private Sensor sensor, vo;
 
-    public Controller() {
-        sensoresFilhos = new LinkedList<>();
-        sensor = new Sensor();
+    public Controller(String id, String ip, String porta) {
+        sensoresAdj = new LinkedList<>();
+        sensor = new Sensor(ip, porta);
+        sensor.setIdSensor(id);
     }
-    
-//    public void addPai(String ip, String porta){
-//        sensorPai = new Sensor(ip, porta);
-//    }
-    
-    public String addFilho(String ip, String porta, String id){
-        Sensor filho = new Sensor(ip, porta);
-        filho.setIdSensor(id);
-        if(!sensoresFilhos.contains(filho))
-            sensoresFilhos.add(filho);
+        
+    public String addAdjacente(String ip, String porta, String id){
+        Sensor novo = new Sensor(ip, porta);
+        novo.setIdSensor(id);
+        if(!sensoresAdj.contains(novo))
+            sensoresAdj.add(novo);
         else
-            return "Filho já existe!";
+            return "Nó já adicionado!";
         return "Adicionado com Sucesso!";
     }
     
     public String getIdPai(){
-        return sensoresFilhos.getFirst().getIdSensor();
+        return sensoresAdj.getFirst().getIdSensor();
     }
     
     public String getIpPai(){
-        return sensoresFilhos.getFirst().getIP();
+        return sensoresAdj.getFirst().getIP();
     }
     
     public String getPortaPai(){
-        return sensoresFilhos.getFirst().getPorta();
+        return sensoresAdj.getFirst().getPorta();
+    }
+    
+    public String getIdVo(){
+        return vo.getIdSensor();
+    }
+    
+    public String getIpVo(){
+        return vo.getIP();
+    }
+    
+    public String getPortaVo(){
+        return vo.getPorta();
+    }
+    public String getId(){
+        return sensor.getIdSensor();
+    }
+    
+    public void setVo(String id, String ip, String porta){
+        vo = new Sensor(ip, porta);
+        vo.setIdSensor(id);
     }
     
     public String[] listarSensores(){
-        String s[] = new String[sensoresFilhos.size()];
+        String s[] = new String[sensoresAdj.size()];
         int i=0;
-        for(Sensor sen: sensoresFilhos){
+        for(Sensor sen: sensoresAdj){
             s[i] = sen.getIdSensor()+"-"+sen.getIP()+":"+sen.getPorta();
             i++;
         }
         return s;
     }
-
-    public void setUmidade(String umidade) {
-        sensor.setHumidade(umidade);
-    }
-
-    public void setVento(String vento) {
-        sensor.setVlcVento(vento);
-    }
-
-    public void setTemperatura(String temp) {
-        sensor.setTemp(temp);
-    }
-
-    public String getDados() {
-        return sensor.getHumidade()+"#"+sensor.getTemp()+"#"+sensor.getVlcVento();
-    }
-
+    
     public void setAcesso(boolean b) {
         sensor.setAcesso(b);
     }
     
+    public boolean listaVazia(){
+        return sensoresAdj.size()==1;
+    }
+
+    public void setPai(String id, String ip, String porta) {
+        Sensor novo = new Sensor(ip, porta);
+        novo.setIdSensor(id);
+        sensoresAdj.removeFirst();
+        sensoresAdj.addFirst(novo);
+    }
 }
