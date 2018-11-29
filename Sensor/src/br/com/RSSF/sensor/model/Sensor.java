@@ -7,7 +7,7 @@ package br.com.RSSF.sensor.model;
 
 /**
  *
- * @author Antonio Raian
+ * @author karolyne
  */
 public class Sensor {
     private String IP;

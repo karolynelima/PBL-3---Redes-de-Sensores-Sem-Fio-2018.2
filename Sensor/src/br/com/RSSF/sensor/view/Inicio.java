@@ -22,7 +22,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Antonio Raian
+ * @author Karolyne
  */
 public class Inicio extends javax.swing.JFrame {
 
@@ -377,8 +377,8 @@ public class Inicio extends javax.swing.JFrame {
 
     private void btnConectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConectActionPerformed
         try {
-            connection = new ConnectionSensor(control.getIpPai(), control.getPortaPai(), control);
-            new ServerTCP(Integer.parseInt(porta), control, connection);
+            connection = new ConnectionSensor(control.getIpPai(), control.getPortaPai(), control);//Passa os dados do primeiro sensor da lista (Pai)
+            new ServerTCP(Integer.parseInt(porta), control, connection);//Cria um servidor TCP com os dados inseridos
             String resp = connection.addNo(ipLocal, porta, idLocal, control.getIdPai(), 1);
             JOptionPane.showMessageDialog(null, resp);
             if(resp.contains("#")){

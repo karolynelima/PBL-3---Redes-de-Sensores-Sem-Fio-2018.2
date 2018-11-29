@@ -2,12 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group>
-            <file>file:/C:/Users/kkaro/Desktop/PBL-3---Redes-de-Sensores-Sem-Fio-2018.2-master/Server/src/br/com/RSSF/server/controller/Controller.java</file>
-            <file>file:/C:/Users/kkaro/Desktop/PBL-3---Redes-de-Sensores-Sem-Fio-2018.2-master/Server/src/br/com/RSSF/server/model/Sensor.java</file>
-            <file>file:/C:/Users/kkaro/Desktop/PBL-3---Redes-de-Sensores-Sem-Fio-2018.2-master/Server/src/br/com/RSSF/server/view/Inicio.java</file>
-            <file>file:/C:/Users/kkaro/Desktop/PBL-3---Redes-de-Sensores-Sem-Fio-2018.2-master/Server/src/br/com/RSSF/server/connection/AtividadeServidor.java</file>
-            <file>file:/C:/Users/kkaro/Desktop/PBL-3---Redes-de-Sensores-Sem-Fio-2018.2-master/Server/src/br/com/RSSF/server/connection/ServerTCP.java</file>
-        </group>
+        <group/>
     </open-files>
 </project-private>

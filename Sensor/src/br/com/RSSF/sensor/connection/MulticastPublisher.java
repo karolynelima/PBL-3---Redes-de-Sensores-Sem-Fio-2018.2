@@ -32,7 +32,7 @@ public class MulticastPublisher {
         buf = multicastMessage.getBytes();
  
         DatagramPacket packet = new DatagramPacket(buf, buf.length, group, Integer.parseInt(porta));
-        System.out.println("Enviando tal coisa:" + multicastMessage);
+        System.out.println("Enviando:" + multicastMessage);
         socket.send(packet);
         socket.close();
     }
